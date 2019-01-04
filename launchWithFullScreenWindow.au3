@@ -1,3 +1,4 @@
+#include <AutoItConstants.au3>
 #include <WinAPIProc.au3>
 #include <WinAPIShPath.au3>
 #include <WinAPISys.au3>
@@ -5,22 +6,33 @@
 #include <WindowsConstants.au3>
 
 Global $newStyle = BitOR($WS_CHILD, $WS_VISIBLE)
-Global $waitTime = 250
+Global $waitTimeInMilis = 250
 Global $cmdLineIdx = 1
+Global $numberOfArgsPassed = $CmdLine[0]
 
-While ($cmdLineIdx <= $CmdLine[0]) And (StringMid($CmdLine[$cmdLineIdx], 1, 1) = "/")
+While ($cmdLineIdx <= $numberOfArgsPassed) And (StringMid($CmdLine[$cmdLineIdx], 1, 1) = "/")
 	if $CmdLine[$cmdLineIdx] = "/withmenu" Then
 		$newStyle = BitOR($WS_POPUP, $WS_VISIBLE)
 		$cmdLineIdx += 1
 	ElseIf $CmdLine[$cmdLineIdx] = "/waittime" Then
-		$waitTime = Int($CmdLine[$cmdLineIdx + 1])
+		If $cmdLineIdx = $numberOfArgsPassed Then
+			ExitWithWrongParameters()
+		EndIf
+
+		$waitTimeInMilis = Number($CmdLine[$cmdLineIdx + 1], $NUMBER_32BIT)
+
+		If $waitTimeInMilis = 0 Then
+			ExitWithWrongParameters()
+		EndIf
+
+		$waitTimeInMilis *= 1000	; We need to multiply by 1000, becase we pass the value as seconds...
 		$cmdLineIdx += 2
 	Else
 		ExitWithWrongParameters()
 	EndIf
 WEnd
 
-If $cmdLineIdx >= $CmdLine[0] Then
+If $cmdLineIdx >= $numberOfArgsPassed Then
 	ExitWithWrongParameters()
 EndIf
 
@@ -28,7 +40,7 @@ Global $windowName = $CmdLine[$cmdLineIdx]
 $cmdLineIdx += 1
 Global $strToRun = ""
 
-While $cmdLineIdx <= $CmdLine[0]
+While $cmdLineIdx <= $numberOfArgsPassed
 	If (StringInStr($CmdLine[$cmdLineIdx], " ") <> 0) And (StringMid($CmdLine[$cmdLineIdx], 1, 1) <> '"') Then
 		$strToRun &= '"' & $CmdLine[$cmdLineIdx] & '" '
 	Else
@@ -44,7 +56,7 @@ if $process = 0 then
 	ExitWithError('Cannot run "' & $strToRun & '".')
 endif
 
-AdlibRegister("ResetFull", $waitTime)
+AdlibRegister("ResetFull", $waitTimeInMilis)
 ProcessWaitClose($process)
 
 Func SetFullScreen($windowHandle)
