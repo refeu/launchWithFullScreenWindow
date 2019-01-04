@@ -8,4 +8,4 @@ Usage: launchWithFullScreenWindow [/withmenu] [/waittime \<timeInSeconds>] \<win
 * \<commandToExecute>: The command to execute
 * \<arg1>...\<argN>: The arguments to pass to the command.
   
-Compiled with [AutoIt](https://www.autoitscript.com).
+Compile with [AutoIt](https://www.autoitscript.com).
