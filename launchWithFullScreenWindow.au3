@@ -1,18 +1,20 @@
 #include <AutoItConstants.au3>
+#include <GuiMenu.au3>
 #include <WinAPIProc.au3>
 #include <WinAPIShPath.au3>
 #include <WinAPISys.au3>
 #include <WinAPISysWin.au3>
 #include <WindowsConstants.au3>
 
-Global $newStyle = BitOR($WS_CHILD, $WS_VISIBLE)
+Global $newStyle = BitOR($WS_POPUP, $WS_VISIBLE)
 Global $waitTimeInMilis = 250
 Global $cmdLineIdx = 1
 Global $numberOfArgsPassed = $CmdLine[0]
+Global $withMenu = False
 
 While ($cmdLineIdx <= $numberOfArgsPassed) And (StringMid($CmdLine[$cmdLineIdx], 1, 1) = "/")
 	if $CmdLine[$cmdLineIdx] = "/withmenu" Then
-		$newStyle = BitOR($WS_POPUP, $WS_VISIBLE)
+		$withMenu = True
 		$cmdLineIdx += 1
 	ElseIf $CmdLine[$cmdLineIdx] = "/waittime" Then
 		If $cmdLineIdx = $numberOfArgsPassed Then
@@ -93,12 +95,17 @@ Func ResetFull()
 		Return
 	EndIf
 
-	if _WinAPI_GetWindowLong($window, $GWL_STYLE) <> $newStyle Then
+	if _WinAPI_GetWindowLong($window, $GWL_STYLE) = $newStyle Then
 		Return
 	EndIf
 
 	_WinAPI_SetWindowLong($window, $GWL_STYLE, $newStyle)
 	_WinAPI_SetWindowLong($window, $GWL_EXSTYLE, BitOR(_WinAPI_GetWindowLong($window, $GWL_EXSTYLE), $WS_EX_TOPMOST))
+
+	If not $withMenu Then
+		_GUICtrlMenu_SetMenu($window, 0)
+	EndIf
+
 	Local $screenSizeX = _WinAPI_GetSystemMetrics($SM_CXSCREEN)
 	Local $screenSizeY = _WinAPI_GetSystemMetrics($SM_CYSCREEN)
 	WinMove($window, "", 0, 0, $screenSizeX, $screenSizeY)
