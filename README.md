@@ -1,5 +1,7 @@
 # launchWithFullScreenWindow
 
+Launches a program and sets a window of that program to full screen.
+
 Usage: launchWithFullScreenWindow [/withmenu] [/waittime \<timeInSeconds>] \<windowName> \<commandToExecute> [\<arg1>...\<argN>]
   
 * /withmenu: Optionally maintains the window menu. If not set, the menu is hidden too.
